@@ -1,1 +1,4 @@
-/u/a/w/aws/public/html/courses/cs704-s17/code/asn1/CodeSkeleton/build
+#!/bin/sh
+# Build the tester programs.
+
+exec ocamlbuild BetaLorCheck.byte BetaLorRepl.byte ToDeBruijnCheck.byte ToDeBruijnRepl.byte

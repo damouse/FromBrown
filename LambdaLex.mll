@@ -1,1 +1,11 @@
-/u/a/w/aws/public/html/courses/cs704-s17/code/asn1/CodeSkeleton/LambdaLex.mll
+{
+ open LambdaParse
+}
+  rule tokenize =
+parse [' ' '\t' '\n' '\r'] {tokenize lexbuf}
+| ['a'-'z'] as s           {Var s}
+| '.'                      {Dot}
+| '('                      {LParen}
+| ')'                      {RParen}
+| '\\'                     {Slash}
+| eof                      {Eof}

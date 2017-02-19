@@ -1,1 +1,33 @@
-/u/a/w/aws/public/html/courses/cs704-s17/code/asn1/CodeSkeleton/check
+#!/bin/bash
+# Script for testing and grading.
+# Seriously, run this before you submit.
+
+./build > /dev/null || (echo "Build failure; no grade."; exit 0)
+
+count_todb=0
+pass_todb=0
+count_beta=0
+pass_beta=0
+
+for f in Tests/*.lam
+do
+    let count_todb=($count_todb + 1)
+    if diff -wq <(./ToDeBruijnCheck.byte < $f) ${f/.lam/.db} > /dev/null;
+    then let pass_todb=($pass_todb + 1);
+    else echo "to_deBruijn wrong on $(basename $f)";
+    fi
+        
+done
+
+for f in Tests/*.db
+do
+    let count_beta=($count_beta + 1)
+    if diff -wq <(./BetaLorCheck.byte < $f) ${f}.out > /dev/null;
+    then let pass_beta=($pass_beta + 1)
+    else echo "beta_lor is wrong on $(basename $f)";
+    fi
+        
+done
+
+echo "to_deBruijn score: ${pass_todb}/${count_todb}"
+echo "beta_lor score: ${pass_beta}/${count_beta}"
