@@ -3,11 +3,10 @@
 
    This program is part of Lambda.to_debruijn's automated tester.
 *)
+open Format
+  
+let _ =
+  let lam = IO.lam_of_channel stdin
+  in (IO.print_lam lam; let db = Lambda.to_debruijn lam in IO.print_db db)
+  
 
-open Format;;
-
-let lam = IO.lam_of_channel stdin in
-IO.print_lam lam;
-let db = Lambda.to_debruijn lam in
-IO.print_db db
-;;
