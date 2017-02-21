@@ -3,7 +3,10 @@
    The DeBruijn module contains the AST for De Bruijn-indexed terms,
    and a function to beta-reduce them. *)
 (* expr: The AST for De Bruijn-indexed terms. *)
-type expr = | Var of int | Lambda of expr | Apply of expr * expr
+type expr = 
+    | Var of int 
+    | Lambda of expr 
+    | Apply of expr * expr
 
 (* Empty: Parser exception for empty inputs. *)
 exception Empty

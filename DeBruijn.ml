@@ -3,7 +3,10 @@
    The DeBruijn module contains the AST for De Bruijn-indexed terms,
    and a function to beta-reduce them. *)
 (* The AST for De Bruijn-indexed terms. *)
-type expr = | Var of int | Lambda of expr | Apply of expr * expr
+type expr = 
+    | Var of int 
+    | Lambda of expr 
+    | Apply of expr * expr
 
 (* Empty: Parser exception for empty inputs. Leave this here. *)
 exception Empty
@@ -23,8 +26,7 @@ let rec print e =
     | (Lambda e, Left, _) -> (l_paren (); print_lambda e; r_paren ())
     | (Lambda e, Right, Left) -> (l_paren (); print_lambda e; r_paren ())
     | (Lambda e, _, _) -> print_lambda e
-    | (Apply (e1, e2), Right, _) ->
-        (l_paren (); print_apply e1 e2 Right; r_paren ())
+    | (Apply (e1, e2), Right, _) ->(l_paren (); print_apply e1 e2 Right; r_paren ())
     | (Apply (e1, e2), d, _) -> print_apply e1 e2 d
   and need_space = ref false
   and l_paren _ = (open_box 0; print_char '('; need_space := false)

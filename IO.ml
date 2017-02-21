@@ -28,30 +28,27 @@ let rec print_lam e =
   let rec print_part =
     function
     | (L.Var c, _, _) -> print_char c
-    | (L.Lambda (c, e), Left, _) ->
-        (l_paren (); print_lambda c e; r_paren ())
-    | (L.Lambda (c, e), Right, Left) ->
-        (l_paren (); print_lambda c e; r_paren ())
+    | (L.Lambda (c, e), Left, _) -> (l_paren (); print_lambda c e; r_paren ())
+    | (L.Lambda (c, e), Right, Left) -> (l_paren (); print_lambda c e; r_paren ())
     | (L.Lambda (c, e), _, _) -> print_lambda c e
-    | (L.Apply (e1, e2), Right, _) ->
-        (l_paren (); print_apply e1 e2 Right; r_paren ())
+    | (L.Apply (e1, e2), Right, _) -> (l_paren (); print_apply e1 e2 Right; r_paren ())
     | (L.Apply (e1, e2), d, _) -> print_apply e1 e2 d
   and print_lambda c e =
     (print_char '\\';
-     print_char c;
-     print_char '.';
-     print_cut ();
-     open_box 0;
-     print_part (e, Down, Down);
-     close_box ())
+    print_char c;
+    print_char '.';
+    print_cut ();
+    open_box 0;
+    print_part (e, Down, Down);
+    close_box ())
   and print_apply e1 e2 d =
     (open_box 0;
-     print_part (e1, Left, d);
-     close_box ();
-     print_cut ();
-     open_box 0;
-     print_part (e2, Right, d);
-     close_box ())
+    print_part (e1, Left, d);
+    close_box ();
+    print_cut ();
+    open_box 0;
+    print_part (e2, Right, d);
+    close_box ())
   and l_paren _ = (open_box 0; print_char '(')
   and r_paren _ = (print_char ')'; close_box ())
   in (open_box 0; print_part (e, Down, Down); close_box (); print_newline ())
@@ -70,8 +67,7 @@ let rec print_db e =
     | (D.Lambda e, Left, _) -> (l_paren (); print_lambda e; r_paren ())
     | (D.Lambda e, Right, Left) -> (l_paren (); print_lambda e; r_paren ())
     | (D.Lambda e, _, _) -> print_lambda e
-    | (D.Apply (e1, e2), Right, _) ->
-        (l_paren (); print_apply e1 e2 Right; r_paren ())
+    | (D.Apply (e1, e2), Right, _) -> (l_paren (); print_apply e1 e2 Right; r_paren ())
     | (D.Apply (e1, e2), d, _) -> print_apply e1 e2 d
   and need_space = ref false
   and l_paren _ = (open_box 0; print_char '('; need_space := false)
