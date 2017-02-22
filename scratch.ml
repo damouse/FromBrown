@@ -21,7 +21,7 @@ let hello () =
     *)
     print_endline greeting;;
 
-hello ();;
+(* hello ();; *)
 
 let add a b =
     a + b
@@ -34,8 +34,8 @@ let is_hello s =
 
 (* Yeah, the double semi is needed when issuing statements in a non-functional context 
 Note also the parenthesis on the arguments to printf*)
-Printf.printf "%b\n" (is_hello "hello");;
-Printf.printf "%b\n" (is_hello "hell");;
+(* Printf.printf "%b\n" (is_hello "hello");; *)
+(* Printf.printf "%b\n" (is_hello "hell");; *)
 
 
 (* LISTS *)
@@ -117,8 +117,8 @@ let is_one =
     | 1 -> true
     | _ -> false;;
 
-Printf.printf "Is one: %b\n" (is_one 1);;
-Printf.printf "Is one: %b\n" (is_one 0);;
+(* Printf.printf "Is one: %b\n" (is_one 1);; *)
+(* Printf.printf "Is one: %b\n" (is_one 0);; *)
 
 (* Matching predicates, aka "guarded pattern matching". *)
 let abs x =
@@ -127,4 +127,42 @@ let abs x =
     | _ -> x
 ;;
 
+(*
+The "expr" types shown in the top of the lambda file is a *variant*.
+    The capitalized names are its "tags," and what follow are the union of types
+    that construct that tag of the type
+*)
+(* type color =
+  | Basic of basic_color * weight (* basic colors, regular and bold *)
+  | RGB   of int * int * int       (* 6x6x6 color cube *)
+  | Gray  of int                   (* 24 grayscale levels *)
+ *)
 
+(* I think the fastest way forward on frombrown is a simple map.*)
+
+(* A very simple implementation of a map that maps strings to ints and can increment them 
+all at once. Hilariously inefficient, but damned cool.
+*)
+module Dictionary =
+  struct
+    exception KeyNotFound
+    let make () = fun _ -> raise KeyNotFound
+    let get d k = d k
+    let put d k v = fun k' -> if k = k' then v else d k'
+    let increment d = fun k -> d k + 1 
+  end    
+
+let dict = Dictionary.make ();;
+let dict = Dictionary.put dict "a" 1;;
+let dict = Dictionary.put dict "b" 2;;
+
+(* let leek =;; *)
+
+Printf.printf "Lookup: %d\n"  (Dictionary.get dict "a");;
+Printf.printf "Lookup: %d\n"  (Dictionary.get dict "b");;
+
+let dict = Dictionary.increment dict;;
+let dict = Dictionary.increment dict;;
+
+Printf.printf "Lookup: %d\n"  (Dictionary.get dict "a");;
+Printf.printf "Lookup: %d\n"  (Dictionary.get dict "b");;

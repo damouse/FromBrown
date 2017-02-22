@@ -46,13 +46,17 @@ let rec print e =
   and r_paren _ = (print_char ')'; close_box ())
   in (open_box 0; print_part (e, Down, Down); close_box (); print_newline ())
 
-(* Return a variable number of tabs *)
-let rec variable_tabs =  function
+(* Return a variable number of tabs. Just here for utility and excercise *)
+let rec variable_tabs = function
     0 -> ""
     | _ as l -> variable_tabs (l - 1) ^ "  ";;
 
-let print_tabbed s l = Printf.printf "%s%s" (variable_tabs l) s
-let tabs l = Printf.printf "%s" (variable_tabs l)
+let print_tabbed s l = 
+    Printf.printf "%s%s" (variable_tabs l) s
+
+let tabs l = 
+    Printf.printf "%s" (variable_tabs l)
+
 
 let rec print_internal e  =
     let rec print_part =
@@ -60,7 +64,7 @@ let rec print_internal e  =
         | (Var c, _, _, l) ->  
             (* print_char c; *)
             tabs l; Printf.printf "Char: %c" c; 
-            (* print_newline (); *)
+            print_newline ();
 
         | (Lambda (c, e), Left, _, l) -> 
             print_tabbed "Lambda- Left: " l; 
@@ -113,25 +117,57 @@ let rec print_internal e  =
         print_part (e2, Right, d, l + 1);
         (* print_newline (); *)
         close_box ())
+
     and l_paren _ = (open_box 0; print_char '(')
     and r_paren _ = (print_char ')'; close_box ())
     in (open_box 0; print_part (e, Down, Down, 0); close_box ();)
   
-(* to_debruijn: converts Lambda.expr terms into equivalent DeBruijn.expr terms.
-
-   Remember: variables free in e should be free in the result, as if
-   they were pointing to a lambda binding just outside the expression.
-
-   Replace 'DeBruijn.Var 1' with your implementation.
-*)
-
 (*
 Sample case for the first task: 
     (\x.x(\y.y)) (\a.\b.b)
     (\\1)\1
-*)
 
-(* Double semi ends the current context, including operations inside functions.  *)
+I understand how to construct the expressions and how to parse them based on the work above. 
+
+Need to do a little thinking on how to construct the values, especially as the depth of bindings increases.
+
+In a sense the structure doesn't really change. The only thing that changes is the value of the int based 
+on the nesting level, which needs to be counted outside in.
+
+Actually, isn't that what I'm counting above with the tabs? Consider:
+    
+    \x.x
+
+On the first level of indentation we know our depth is 1 and therefor the var 1 should take that same value. 
+How do you know which variable is currently being tracked? The "Bound" list?
+
+-- Dict
+Pass a dict down. Every lambda (or binding) add the seen var to the dict and continue downwards. On each 
+step down, increment field of dict based on depth. When a var is seen, replace it with its value.
+
+If lambda: add the var to the dict
+On each (lambdas only, right?) step, increment value and pass dict copy down
+
+Lambda('x',             [x: 1]
+  Lambda('y',           [x: 2, y: 1]
+    Apply( 
+      Apply(
+        Var 'x',        Resolve x to 2
+        Var 'y'         resolve x to 1
+      ),
+      Var 'x')          Resolve x to 2
+    ))
+
+Seems simple. The information being passed along is only what we need: the depth of the last bindings
+
+-- Parent
+Could also build an intermediate data structure based on the lambda tree as you move down. When a var needs 
+a number, stop building the debruijin terms and hunt back upwards until its binding is discovered. Less efficient, 
+but more logical.
+
+Will likely need a more "object" like structure that can hold a reference to its parent. The refs are built up as 
+we descend down the tree
+*)
 
 let to_debruijn e = 
     print_internal e;
