@@ -141,13 +141,13 @@ The "expr" types shown in the top of the lambda file is a *variant*.
 (* I think the fastest way forward on frombrown is a simple map.*)
 
 (* A very simple implementation of a map that maps strings to ints and can increment them 
-all at once. Hilariously inefficient, but damned cool.
+all at once. As hilariously inefficient as it is cool.
 *)
 module Dictionary =
   struct
     exception KeyNotFound
     let make () = fun _ -> raise KeyNotFound
-    let get d k = d k
+    (* let get d k = d k *)
     let put d k v = fun k' -> if k = k' then v else d k'
     let increment d = fun k -> d k + 1 
   end    
@@ -158,11 +158,11 @@ let dict = Dictionary.put dict "b" 2;;
 
 (* let leek =;; *)
 
-Printf.printf "Lookup: %d\n"  (Dictionary.get dict "a");;
-Printf.printf "Lookup: %d\n"  (Dictionary.get dict "b");;
+Printf.printf "Lookup: %d\n"  (dict "a");;
+Printf.printf "Lookup: %d\n"  (dict "b");;
 
 let dict = Dictionary.increment dict;;
 let dict = Dictionary.increment dict;;
 
-Printf.printf "Lookup: %d\n"  (Dictionary.get dict "a");;
-Printf.printf "Lookup: %d\n"  (Dictionary.get dict "b");;
+Printf.printf "Lookup: %d\n"  (dict "a");;
+Printf.printf "Lookup: %d\n"  (dict "b");;
