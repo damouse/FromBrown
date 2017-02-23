@@ -147,7 +147,6 @@ module Dictionary =
   struct
     exception KeyNotFound
     let make () = fun _ -> raise KeyNotFound
-    (* let get d k = d k *)
     let put d k v = fun k' -> if k = k' then v else d k'
     let increment d = fun k -> d k + 1 
   end    
@@ -155,8 +154,6 @@ module Dictionary =
 let dict = Dictionary.make ();;
 let dict = Dictionary.put dict "a" 1;;
 let dict = Dictionary.put dict "b" 2;;
-
-(* let leek =;; *)
 
 Printf.printf "Lookup: %d\n"  (dict "a");;
 Printf.printf "Lookup: %d\n"  (dict "b");;

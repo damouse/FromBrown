@@ -105,6 +105,7 @@ let rec print_internal e  =
         print_newline ();
         print_part (e, Down, Down, l + 1);
         close_box ())
+
     and print_apply e1 e2 d l =
         (* print_tabbed "print_apply" l; *)
 
@@ -120,6 +121,7 @@ let rec print_internal e  =
 
     and l_paren _ = (open_box 0; print_char '(')
     and r_paren _ = (print_char ')'; close_box ())
+
     in (open_box 0; print_part (e, Down, Down, 0); close_box ();)
   
 (*
@@ -169,8 +171,29 @@ Will likely need a more "object" like structure that can hold a reference to its
 we descend down the tree
 *)
 
+
+(* A very simple implementation of a map that maps strings to ints and can increment them 
+all at once. As hilariously inefficient as it is cool.
+*)
+module Dictionary =
+  struct
+    exception KeyNotFound
+    let make () = fun _ -> 1
+    let put d k v = fun k' -> if k = k' then v else d k'
+    let increment d = fun k -> d k + 1 
+  end    
+
+
+let rec convert e dict = 
+    match e with 
+    | Var c ->  DeBruijn.Var (dict c)
+    | Lambda (c, e) -> DeBruijn.Lambda (convert e (Dictionary.increment (Dictionary.put dict c 0)))
+    | Apply (e1, e2) -> DeBruijn.Apply ((convert e1 dict), (convert e2 dict))
+
 let to_debruijn e = 
-    print_internal e;
+    (* Really thought this was gold, but wiffing all the tests badly *)
+    (* convert e (Dictionary.make ()) *)
+    
     DeBruijn.Var 1
   
 
