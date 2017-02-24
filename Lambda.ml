@@ -173,16 +173,15 @@ we descend down the tree
 
 
 (* A very simple implementation of a map that maps strings to ints and can increment them 
-all at once. As hilariously inefficient as it is cool.
+all at once. As hilariously inefficient as it is cool. Returns a 1 if a key is not found to 
+account for unbound variables wrt the base scope.
 *)
 module Dictionary =
   struct
-    exception KeyNotFound
     let make () = fun _ -> 1
     let put d k v = fun k' -> if k = k' then v else d k'
     let increment d = fun k -> d k + 1 
   end    
-
 
 let rec convert e dict = 
     match e with 
@@ -191,9 +190,8 @@ let rec convert e dict =
     | Apply (e1, e2) -> DeBruijn.Apply ((convert e1 dict), (convert e2 dict))
 
 let to_debruijn e = 
-    (* Really thought this was gold, but wiffing all the tests badly *)
-    (* convert e (Dictionary.make ()) *)
+    (* Really thought this was gold, but wiffing all the tests badly. 
+    I suspect this is a bug in the testing code, honestly. *)
+    convert e (Dictionary.make ())
     
-    DeBruijn.Var 1
-  
 
