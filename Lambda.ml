@@ -46,22 +46,14 @@ let rec print e =
   and r_paren _ = (print_char ')'; close_box ())
   in (open_box 0; print_part (e, Down, Down); close_box (); print_newline ())
 
-(* A very simple implementation of a map that maps strings to ints and can increment them 
-all at once. As hilariously inefficient as it is cool.
-*)
-module Dict =
-  struct
-    let make () = fun _ -> 1
-    let put d k v = fun k' -> if k = k' then v else d k'
-    let increment d = fun k -> d k + 1 
-  end    
-
+(* This is the biggest gripe I have with funcitonal programming: it lends itself to concise, 
+"interesting" solutions that are as inscrutible as they are interesting. *)
 let to_debruijn e = 
-    let rec conv e dict = match e with 
-        | Var c ->  DeBruijn.Var (dict c)
-        | Lambda (c, e) -> DeBruijn.Lambda (conv e (Dict.increment (Dict.put dict c 0)))
-        | Apply (e1, e2) -> DeBruijn.Apply ((conv e1 dict), (conv e2 dict))
+  let rec conv e d = match e with 
+    | Var c ->  DeBruijn.Var (d c)
+    | Lambda (k, e) -> DeBruijn.Lambda (conv e (fun k' -> (if k = k' then 0 else d k') + 1))
+    | Apply (e1, e2) -> DeBruijn.Apply ((conv e1 d), (conv e2 d))
 
-    in conv e (Dict.make ())
+  in conv e (fun _ -> 1)
   
 
