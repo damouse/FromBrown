@@ -6,8 +6,11 @@
 
 open Format;;
 
+(* let line = input_line stdin;; *)
+(* let lam = IO.lam_of_string line;; *)
+
 let lam = IO.lam_of_channel stdin in
-IO.print_lam lam;
+(* IO.print_lam lam; *)
 let db = Lambda.to_debruijn lam in
 IO.print_db db
 ;;

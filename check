@@ -12,7 +12,8 @@ pass_beta=0
 for f in Tests/*.lam
 do
     let count_todb=($count_todb + 1)
-    if diff -wq <(./ToDeBruijnCheck.byte < $f) ${f/.lam/.db} > /dev/null;
+    # echo ${f/.lam/.db} 
+    if diff -wq <(./ToDeBruijnCheck.byte < $f) ${f/.lam/.db};
     then let pass_todb=($pass_todb + 1);
     else echo "to_deBruijn wrong on $(basename $f)";
     fi
