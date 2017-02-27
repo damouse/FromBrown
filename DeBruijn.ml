@@ -74,5 +74,11 @@ let rec reducible e =  match e with
     | Apply (Lambda (l), r) -> true
     | Apply (l, r) -> (reducible l) || (reducible r)
 
+(*
+Failing sample case: 
+input:              \(\2(1 1))\2(1 1)
+Expected Output:    \1\(\3\2 2 1)(\3\2 2 1)1
+Actual Output:      \2((\2(1 1))\2(1 1))
+*)
 let beta_lor e = 
   if (reducible e) then Some (reduce e) else None
