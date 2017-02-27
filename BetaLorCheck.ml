@@ -5,9 +5,14 @@
 *)
 open Format;;
 
-(* let teststr = "(\\1\\1)\\\\1";; *)
+(* Expect: (\\1)\1 *)
+let teststr = "(\\1\\1)\\\\1";;
+
+(* Expect: \(\1)1*)
 (* let teststr = "(\\\\2 1)(\\1)";; *)
-let teststr = "\\(\\\\2 1) (\\2)";;
+
+(* Expect: \\(\3)1 *)
+(* let teststr = "\\(\\\\ 2 1) (\\2)";; *)
 
 let db = IO.db_of_string teststr;;
 print_string "  Pre: "; IO.print_db db;;

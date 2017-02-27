@@ -63,12 +63,14 @@ Call the function with the current depth and a cutoff of 0.
 let rec lift term depth cutoff = 
     match term with 
     | Var v -> 
-        Printf.printf "Lifting var %d \n" v; 
+        Printf.printf "Lifting var %d depth: %d cutoff: %d\n" v depth cutoff; 
         if v > cutoff then Var (v + depth -1) else term
 
     | Lambda (e) -> 
-        Printf.printf "Lifting lambda: "; print e;
-        Lambda (lift e depth (cutoff + 1))
+        Printf.printf "Lifting lambda: "; print term;
+        let ret = Lambda (lift e depth (cutoff + 1)) in
+        Printf.printf "Lift returning lambda: "; print ret;
+        ret
 
     | Apply (l, r) -> Printf.printf "Lift apply \n";
         Apply ((lift l depth cutoff), (lift r depth cutoff))
@@ -78,10 +80,14 @@ let rec substitute term into depth =
     match into with 
     | Var v ->  
         Printf.printf "Sub Value: %d, depth: %d\n" v depth; 
-        if v = depth then (lift term depth 1) else into
+        if v = depth then Printf.printf "Sub depth match\n" else Printf.printf "Sub depth nomatch\n";
+        if v = depth then (lift term depth 0) else into
     | Lambda (e) -> 
-        Printf.printf "Sub Lambda "; print e; 
-        Lambda (substitute term e (depth + 1))
+        Printf.printf "Sub Lambda "; print into; 
+        let ret = Lambda (substitute term e (depth + 1)) in 
+        Printf.printf "Sub returning lambda: "; print ret;
+        ret
+
     | Apply (l, r) -> 
         Printf.printf "Sub Apply "; print into; 
         Apply ((substitute term l depth), (substitute term r depth))
@@ -97,7 +103,7 @@ let rec find_reduce e =
             e
         | Lambda (l) -> 
             Printf.printf "Find lambda "; print e;
-            find_reduce l
+            Lambda (find_reduce l)
         | Apply (Lambda (l), r) -> 
             Printf.printf "Find matching apply "; print e; 
             substitute r l 1
@@ -108,9 +114,10 @@ let rec find_reduce e =
 let rec has_redux e = 
     match e with 
         | Var v -> false
-        | Lambda (l) -> false && (has_redux l)
+        | Lambda (l) -> false || (has_redux l)
         | Apply (Lambda (l), r) -> true
-        | Apply (l, r) -> (has_redux l) && (has_redux r)
+        | Apply (l, r) -> (has_redux l) || (has_redux r)
 
 let beta_lor e = 
-    if (has_redux e) then Some (find_reduce e) else None
+  (* Some (find_reduce e) *)
+  if (has_redux e) then Some (find_reduce e) else None
