@@ -48,17 +48,6 @@ let rec print e =
      close_box ())
   in (open_box 0; print_part (e, Down, Down); close_box (); print_newline ())
 
-Fixpoint liftVar n (x : fin n) : fin (pred n) -> fin n :=
-  match x with
-    | First _ => fun y => Next y
-    | Next _ x' => fun y =>
-      match y in fin n' return fin n' -> (fin (pred n') -> fin n')
-        -> fin (S n') with
-        | First _ => fun x' _ => First
-        | Next _ y' => fun _ fx' => Next (fx' y')
-      end x' (liftVar x')
-  end.
-  
 (* 
 Working Example foo1
     lam: (\x.x(\y.y)) (\a.\b.b)
@@ -66,9 +55,50 @@ Working Example foo1
 
     Beta reduction: (\\1)\1
 *)
+
+(* Lifting in expression e at new depth *)
+let lift e depth = 
+    match e with 
+    | Var v -> Printf.printf "Var \n"
+    | Lambda (e) -> Printf.printf "Lambda \n"
+    | Apply (l, r) -> Printf.printf "Apply \n"
+
+(*
+Substitute expression e into expression l for vars that match the given depth d.
+
+Called the first time with lambda, expression, 1. Every Var encountered at 1 is replaced with expression.
+Every Lambda encountered recursively calls this function, increasing the depth. 
+
+Note that sub should already be lifted to the initial depth of the substitution. 
+*)
+let rec substitute target exp depth = 
+    match target with 
+    (* If depth matches, correct lambda switch. Return the expression *)
+    | Var v ->  Printf.printf "Value\n"; if v = depth then exp else target
+
+    (* Increment the value *)
+    | Lambda (e) -> Printf.printf "Lambda\n"; substitute e exp (depth + 1)
+
+    | Apply (l, r) -> Printf.printf "Apply\n"; Apply ((substitute l exp depth), (substitute l exp depth))
+
+(* 
+Find a reduction, perform the reduction, and then return instead of continuing onwards. 
+
+Every step of the match should return e, the current expression, except the substitution step. 
+*)
+let rec find_reduce e = 
+    match e with 
+        | Lambda (l) -> find_reduce l
+
+        (* Found the redux. Perform it and return *)
+        | Apply (Lambda (l), r) -> Printf.printf "Found it! \n"; substitute l r 1 
+
+        (* Fall through on everything else *)
+        | _ -> print e; e
+
 let beta_lor e = 
-    Printf.printf "In the FUCKING check\n";
-    Some (beta_reduce e)
+    (* lift e; *)
+    Some (find_reduce e)
+
     (* None *)
   
-
