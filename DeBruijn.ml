@@ -53,6 +53,16 @@ let rec print e =
 
    Replace the 'None' here with your implementation.
 *)
-let beta_lor e = None
+
+(* 
+Working Example foo1
+    lam: (\x.x(\y.y)) (\a.\b.b)
+    db: (\1\1)\\1
+
+    Beta reduction: (\\1)\1
+*)
+let beta_lor e = 
+    Printf.printf "In the FUCKING check\n";
+    None
   
 

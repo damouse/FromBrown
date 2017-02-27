@@ -55,3 +55,4 @@ let to_debruijn e =
     | Lambda (k, e) -> DeBruijn.Lambda (conv e (fun k' -> (if k = k' then 0 else d k') + 1))
     | Apply (e1, e2) -> DeBruijn.Apply ((conv e1 d), (conv e2 d))
 
+  in conv e (fun _ -> 1)
