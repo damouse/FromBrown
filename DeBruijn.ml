@@ -62,34 +62,29 @@ Call the function with the current depth and a cutoff of 0.
 *)
 let rec lift term depth cutoff = 
     match term with 
-    | Var v -> Printf.printf "Lift var \n"; if v > cutoff then Var (v + depth -1) else term
-    | Lambda (e) -> Printf.printf "Lift lambda \n"; Lambda (lift e depth (cutoff + 1))
-    | Apply (l, r) -> Printf.printf "Lift apply \n"; Apply ((lift l depth cutoff), (lift r depth cutoff))
+    | Var v -> 
+        Printf.printf "Lifting var %d \n" v; 
+        if v > cutoff then Var (v + depth -1) else term
 
-(*
-Substitute expression e into expression l for vars that match the given depth d.
+    | Lambda (e) -> 
+        Printf.printf "Lifting lambda: "; print e;
+        Lambda (lift e depth (cutoff + 1))
 
-Called the first time with lambda, expression, 1. Every Var encountered at 1 is replaced with expression.
-Every Lambda encountered recursively calls this function, increasing the depth. 
+    | Apply (l, r) -> Printf.printf "Lift apply \n";
+        Apply ((lift l depth cutoff), (lift r depth cutoff))
 
-Note that sub should already be lifted to the initial depth of the substitution. 
-*)
-(* let rec substitute target exp depth = 
-    match target with 
-    (* If depth matches, correct lambda switch. Return the expression *)
-    | Var v ->  Printf.printf "Value\n"; if v = depth then exp else target
-
-    (* Increment the value *)
-    | Lambda (e) -> Printf.printf "Lambda\n"; substitute e exp (depth + 1)
-
-    | Apply (l, r) -> Printf.printf "Apply\n"; Apply ((substitute l exp depth), (substitute l exp depth))
- *)
 (* Substitute "term" into "into" at the current depth *)
 let rec substitute term into depth = 
     match into with 
-    | Var v ->  Printf.printf "Sub Value\n"; if v = depth then (lift term depth 1) else into
-    | Lambda (e) -> Printf.printf "Sub Lambda\n"; Lambda (substitute term e (depth + 1))
-    | Apply (l, r) -> Printf.printf "Sub Apply\n"; Apply ((substitute term l depth), (substitute term r depth))
+    | Var v ->  
+        Printf.printf "Sub Value: %d, depth: %d\n" v depth; 
+        if v = depth then (lift term depth 1) else into
+    | Lambda (e) -> 
+        Printf.printf "Sub Lambda "; print e; 
+        Lambda (substitute term e (depth + 1))
+    | Apply (l, r) -> 
+        Printf.printf "Sub Apply "; print into; 
+        Apply ((substitute term l depth), (substitute term r depth))
 
 (* 
 Find a beta reduction and carry it out.
@@ -98,10 +93,17 @@ Every step of the match should return e, the current expression, except the subs
 *)
 let rec find_reduce e = 
     match e with 
-        | Var v -> e
-        | Lambda (l) -> Printf.printf "Find lambda\n"; find_reduce l
-        | Apply (Lambda (l), r) -> Printf.printf "Find matching apply\n"; substitute r l 1
-        | Apply (l, r) -> "Find misc\n"; Apply ((find_reduce l), (find_reduce r))
+        | Var v -> 
+            e
+        | Lambda (l) -> 
+            Printf.printf "Find lambda "; print e;
+            find_reduce l
+        | Apply (Lambda (l), r) -> 
+            Printf.printf "Find matching apply "; print e; 
+            substitute r l 1
+        | Apply (l, r) -> 
+            "Find non-matching apply "; print e; 
+            Apply ((find_reduce l), (find_reduce r))
 
 let rec has_redux e = 
     match e with 
